@@ -43,7 +43,7 @@ class Query extends \yii\db\Query implements QueryInterface
     }
 
     /**
-     * Получаем количетсво объектов
+     * Получаем количество объектов
      *
      * @param string $q
      * @param null $db

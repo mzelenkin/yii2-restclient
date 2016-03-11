@@ -38,11 +38,10 @@ class QueryBuilder extends \yii\db\QueryBuilder
     public function build($query, $params = [])
     {
         $query->prepare($this);
-
         $this->buildSelect($query->select, $params);
-//        $this->buildLimit($query->limit, $params);
+        $this->buildPerPage($query->limit, $params);
         $this->buildPage($query->offset, $query->limit, $params);
-        $params = ArrayHelper::merge($params, $this->buildOrderBy($query->orderBy));
+        $this->buildSort($query->orderBy, $params);
         $params = ArrayHelper::merge($params, $this->buildCondition($query->where, $params));
 
         return [
@@ -60,6 +59,19 @@ class QueryBuilder extends \yii\db\QueryBuilder
     }
 
     /**
+     * Устанавливаем количество записей на страницу
+     *
+     * @param $limit
+     * @param $params
+     */
+    public function buildPerPage($limit, &$params)
+    {
+        if (is_int($limit)) {
+            $params['per-page'] = $limit;
+        }
+    }
+
+    /**
      * @param $offset
      * @param $limit
      * @param $params
@@ -74,14 +86,23 @@ class QueryBuilder extends \yii\db\QueryBuilder
     /**
      * @inheritdoc
      */
-    public function buildOrderBy($orderBy)
+    public function buildOrderBy($columns)
     {
-        $params = [];
+        throw new NotSupportedException('buildOrderBy in is not supported.');
+    }
+
+    /**
+     * Устанавливаем параметр сортировки
+     *
+     * @param $orderBy
+     * @param $params
+     * @return array
+     */
+    public function buildSort($orderBy, &$params)
+    {
         if (!empty($orderBy)) {
             $params['sort'] = $this->_sort[reset($orderBy)] . key($orderBy);
         }
-
-        return $params;
     }
 
     /**
