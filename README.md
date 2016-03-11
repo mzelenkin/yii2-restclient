@@ -67,8 +67,8 @@ $config['modules']['debug'] = [
 
 ## Лицензия
 
-Этот проект был выпущен под лицензией BSD-3-Clause [license](LICENSE).
-Подробнее [here](http://choosealicense.com/licenses/bsd-3-clause).
+Этот проект был выпущен под лицензией [BSD-3-Clause](LICENSE).
+Подробнее [тут](http://choosealicense.com/licenses/bsd-3-clause).
 
 Copyright © 2016, ApexWire
 
