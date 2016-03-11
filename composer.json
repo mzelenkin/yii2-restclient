@@ -1,0 +1,37 @@
+{
+  "name": "apexwire/yii2-restclient",
+  "type": "yii2-extension",
+  "description": "Tools to use API as ActiveRecord for Yii2",
+  "keywords": [
+    "api",
+    "ActiveRecord",
+    "extension",
+    "yii2"
+  ],
+  "homepage": "https://github.com/apexwire/yii2-restclient",
+  "license": "BSD-3-Clause",
+  "support": {
+    "source": "https://github.com/apexwire/yii2-restclient",
+    "issues": "https://github.com/apexwire/yii2-restclient/issues",
+    "wiki": "https://github.com/apexwire/yii2-restclient/wiki"
+  },
+  "authors": [
+    {
+      "name": "ApexWire",
+      "email": "apexwire@gmail.com"
+    }
+  ],
+  "require": {
+    "yiisoft/yii2": "~2.0",
+    "guzzlehttp/guzzle": "6.*"
+  },
+  "require-dev": {
+    "minii/db": "*@dev",
+    "minii/helpers": "*@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "yii\\restclient\\": "src"
+    }
+  }
+}
