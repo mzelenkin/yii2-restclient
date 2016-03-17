@@ -60,11 +60,9 @@ class Command extends Component
     public function queryOne($options = [])
     {
         //TODO: use $this->getOldPrimaryKey() yii\restclient\ActiveRecord
-        $url = $this->index . '/' . ArrayHelper::getValue($this->queryParts, 'id');
-        ArrayHelper::remove($this->queryParts, 'id');
-        $options = array_merge($this->queryParts, $options);
+        $url = $this->index . '/' . current($this->queryParts);
 
-        return $this->db->get($url, $options);
+        return $this->db->get($url);
     }
 
     /**

@@ -3,6 +3,7 @@ apexwire/yii2-restclient changelog
 
 ## 0.3 Under development
 
+-  Поиск сломал страницу просмотра #10 
 
 ## 0.2 2016-03-17
 
