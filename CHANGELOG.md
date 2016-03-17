@@ -12,6 +12,9 @@ apexwire/yii2-restclient changelog
 - Query. Удалены параметры $index и $type. Добавлен параметр $searchModel (task #3)
 - QueryBuilder. Добавлена функция для  обработки условия выборки - buildFind. При использовании функции buildCondition и buildWhere теперь выбраывается исключение
 - RestQuery. Генерируем searchModel на основе modelClass. Например если название модели "common\models\User" то название searchModel будет сгенерировано "UserSearch" (потому что в yii2 для поиска используется своя модель) (task #3)
+- добавлена папка "example-client". Включает в себя файлы клиентской части: контроллера, двух моделей и представлений
+- добавлено описание работы поиска docs/find.md
+- удалены старые файлы документации
 
 ## 0.1 2016-03-11
 
