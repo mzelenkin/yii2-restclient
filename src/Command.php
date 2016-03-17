@@ -78,7 +78,9 @@ class Command extends Component
      */
     public function head()
     {
-        return $this->db->head($this->index);
+        $query = is_array($this->queryParts) ? $this->queryParts : [];
+
+        return $this->db->head($this->index, $query);
     }
 
     /**

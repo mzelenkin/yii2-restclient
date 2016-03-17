@@ -62,8 +62,12 @@ class RestQuery extends Query implements ActiveQueryInterface
             $db = $modelClass::getDb();
         }
 
-        if ($this->index === null) {
-            $this->index = $modelClass::modelName();
+        if ($this->from === null) {
+            $this->from = $modelClass::modelName();
+        }
+
+        if ($this->searchModel === null) {
+            $this->searchModel = mb_substr(mb_strrchr($this->modelClass, '\\'), 1) . 'Search';
         }
 
         return parent::createCommand($db);

@@ -6,6 +6,12 @@ apexwire/yii2-restclient changelog
 - QueryBuilder. Функции buildLimit и buildOrderBy не поддерживаются и выдают исключение
 - QueryBuilder. Функция buildPerPage - устанавливает количество записей на страницу 
 - QueryBuilder. Функция buildSort (бывшая buildOrderBy) - реализует сортировку записей
+- добавлены GET парметры для HEAD запросов
+- подправлен DebugAction. Добавлен параметр время выполнения. Параметр time изменен на duration
+- DebugPanel корректная обработка ajax ответов. Отображает так же время выполнения. Отображает headers в случае если запрос HEAD. (task #5)
+- Query. Удалены параметры $index и $type. Добавлен параметр $searchModel (task #3)
+- QueryBuilder. Добавлена функция для  обработки условия выборки - buildFind. При использовании функции buildCondition и buildWhere теперь выбраывается исключение
+- RestQuery. Генерируем searchModel на основе modelClass. Например если название модели "common\models\User" то название searchModel будет сгенерировано "UserSearch" (потому что в yii2 для поиска используется своя модель) (task #3)
 
 ## 0.1 2016-03-11
 

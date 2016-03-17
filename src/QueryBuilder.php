@@ -38,15 +38,16 @@ class QueryBuilder extends \yii\db\QueryBuilder
     public function build($query, $params = [])
     {
         $query->prepare($this);
+
         $this->buildSelect($query->select, $params);
         $this->buildPerPage($query->limit, $params);
         $this->buildPage($query->offset, $query->limit, $params);
+        $this->buildFind($query->where, $query->searchModel, $params);
         $this->buildSort($query->orderBy, $params);
-        $params = ArrayHelper::merge($params, $this->buildCondition($query->where, $params));
 
         return [
             'queryParts' => $params,
-            'index' => $query->index
+            'index' => $query->from
         ];
     }
 
@@ -92,6 +93,24 @@ class QueryBuilder extends \yii\db\QueryBuilder
     }
 
     /**
+     * Преобразуем массив параметров where в массив для поиска
+     *
+     * @param $condition
+     * @param $searchModel
+     * @param $params
+     */
+    public function buildFind($condition, $searchModel, &$params)
+    {
+        if (!empty($condition) && is_array($condition)) {
+
+            foreach ($condition as $label => $value) {
+                $params[$searchModel . '[' . $label . ']'] = $value;
+                unset($params[$label]);
+            }
+        }
+    }
+
+    /**
      * Устанавливаем параметр сортировки
      *
      * @param $orderBy
@@ -120,35 +139,7 @@ class QueryBuilder extends \yii\db\QueryBuilder
      */
     public function buildCondition($condition, &$params)
     {
-        static $builders = [
-            'and' => 'buildAndCondition',
-            'between' => 'buildBetweenCondition',
-            'eq' => 'buildEqCondition',
-            'in' => 'buildInCondition',
-            'like' => 'buildLikeCondition',
-            'gt' => 'buildGreaterThenCondition',
-            'lt' => 'buildLessThanCondition',
-        ];
-        if (empty($condition)) {
-            return [];
-        }
-        if (!is_array($condition)) {
-            throw new NotSupportedException('String conditions in where() are not supported by HiActiveResource.');
-        }
-
-        if (isset($condition[0])) { // operator format: operator, operand 1, operand 2, ...
-            $operator = strtolower($condition[0]);
-            if (isset($builders[$operator])) {
-                $method = $builders[$operator];
-                array_shift($condition); // Shift build condition
-
-                return $this->$method($operator, $condition);
-            } else {
-                throw new InvalidParamException('Found unknown operator in query: ' . $operator);
-            }
-        } else {
-            return $this->buildHashCondition($condition, $params);
-        }
+        throw new NotSupportedException('buildCondition in is not supported.');
     }
 
     /**
@@ -207,5 +198,10 @@ class QueryBuilder extends \yii\db\QueryBuilder
     protected function buildCompositeInCondition($operator, $columns, $values, &$params)
     {
         throw new NotSupportedException('buildCompositeInCondition in is not supported.');
+    }
+
+    public function buildWhere($condition, &$params)
+    {
+        throw new NotSupportedException('buildWhere in is not supported.');
     }
 }

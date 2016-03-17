@@ -91,17 +91,12 @@ class DebugAction extends Action
                 throw new NotSupportedException("Request method '$method' is not supported by HiArt.");
         }
         $time = microtime(true) - $time;
-
-        if ($result === true) {
-            $result = '<span class="label label-success">success</span>';
-        } elseif ($result === false) {
-            $result = '<span class="label label-danger">no success</span>';
-        }
-
+        $now = microtime(true);
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         return [
-            'time' => sprintf('%.1f ms', $time * 1000),
+            'time' => date('H:i:s.', $now) . sprintf('%03d', (int)(($now - (int)$now) * 1000)),
+            'duration' => sprintf('%.1f ms', $time * 1000),
             'result' => $result,
         ];
     }

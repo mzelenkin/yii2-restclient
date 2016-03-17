@@ -22,8 +22,8 @@ use yii\helpers\ArrayHelper;
  */
 class Query extends \yii\db\Query implements QueryInterface
 {
-    public $index;
-    public $type;
+    /** @type string Название модели, которая используется для поиска */
+    public $searchModel;
 
     /**
      * @param null $db
@@ -65,14 +65,10 @@ class Query extends \yii\db\Query implements QueryInterface
     }
 
     /**
-     * Устанавливает from.
-     * @deprecated Не поддерживается
-     *
-     * @param array|string $index
-     * @param null $type
-     * @throws NotSupportedException
+     * @inheritdoc
+     * @deprecated
      */
-    public function from($index, $type = null)
+    public function from($tables)
     {
         throw new NotSupportedException('from in is not supported.');
     }

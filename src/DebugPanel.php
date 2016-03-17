@@ -134,7 +134,8 @@ HTML;
 </tr>
 <tr style="display: none;" class="restclient-wrapper" data-id="$i">
     <td class="time"></td>
-    <td colspan="3" class="result"></td>
+    <td class="duration"></td>
+    <td colspan="2" class="result"></td>
 </tr>
 HTML;
             ++$i;
@@ -188,8 +189,14 @@ $('.restclient-link').on('click', function (event) {
                is_json = false;
             }
             result.find('.time').html(data.time);
+            result.find('.duration').html(data.duration);
             if (is_json) {
                 result.find('.result').html( syntaxHighlight( JSON.stringify( JSON.parse(data.result), undefined, 10) ) );
+            } else if (data.result instanceof Object) {
+                console.log(typeof(data.result));
+                var html = '';
+                for (var key in data.result) { html += key+':'+data.result[key]+'<br/>'; }
+                result.find('.result').html( html );
             } else {
                 result.find('.result').html( data.result );
             }
