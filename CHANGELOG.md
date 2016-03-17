@@ -1,7 +1,10 @@
 apexwire/yii2-restclient changelog
 ---------------------------
 
-## 0.2 Under development
+## 0.3 Under development
+
+
+## 0.2 2016-03-17
 
 - QueryBuilder. Функции buildLimit и buildOrderBy не поддерживаются и выдают исключение
 - QueryBuilder. Функция buildPerPage - устанавливает количество записей на страницу 
