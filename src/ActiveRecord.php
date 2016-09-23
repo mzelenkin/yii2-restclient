@@ -11,16 +11,14 @@
 
 namespace yii\restclient;
 
+use GuzzleHttp\Exception\ClientException;
 use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
-use yii\db\ActiveQueryInterface;
 use yii\db\BaseActiveRecord;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
 use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-use GuzzleHttp\Exception\ClientException;
 use yii\helpers\Json;
 
 /**
@@ -30,7 +28,8 @@ use yii\helpers\Json;
 class ActiveRecord extends BaseActiveRecord
 {
     /**
-     * {@inheritdoc}
+     * @return null|Connection
+     * @throws InvalidConfigException
      */
     public static function getDb()
     {
@@ -38,9 +37,9 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
-     * @return RestQuery the newly created [[RestQuery]] instance.
+     * @return RestQuery
      */
     public static function find($options = [])
     {
@@ -53,7 +52,7 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public static function findAll($condition, $options = [])
     {
@@ -61,7 +60,7 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public static function primaryKey()
     {
@@ -69,7 +68,7 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function attributes()
     {
@@ -85,7 +84,7 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function insert($runValidation = true, $attributes = null)
     {
@@ -110,10 +109,9 @@ class ActiveRecord extends BaseActiveRecord
             $changedAttributes = array_fill_keys(array_keys($values), null);
             $this->setOldAttributes($values);
             $this->afterSave(true, $changedAttributes);
-        } catch (\Exception $e) {
+        } catch (ClientException $e) {
 
             if ($e->getCode() == 422) {
-
                 $res = $e->getResponse()->getBody()->getContents();
 
                 if (preg_grep('|application/json|i', $e->getResponse()->getHeader('Content-Type'))) {
@@ -136,7 +134,7 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function updateInternal($attributes = null)
     {
@@ -165,7 +163,7 @@ class ActiveRecord extends BaseActiveRecord
             }
 
             $this->afterSave(false, $changedAttributes);
-        } catch (\Exception $e) {
+        } catch (ClientException $e) {
 
             if ($e->getCode() == 422) {
 
@@ -192,7 +190,7 @@ class ActiveRecord extends BaseActiveRecord
 
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete($options = [])
     {
@@ -207,7 +205,6 @@ class ActiveRecord extends BaseActiveRecord
                 );
 
                 $result = true;
-
                 $this->setOldAttributes(null);
                 $this->afterDelete();
             }
@@ -224,7 +221,7 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function getIsNewRecord()
     {
@@ -232,9 +229,7 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * Destroys the relationship in current model.
-     *
-     * This method is not supported by HiArt.
+     * @inheritdoc
      */
     public function unlinkAll($name, $delete = false)
     {

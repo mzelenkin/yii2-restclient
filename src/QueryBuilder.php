@@ -11,15 +11,17 @@
 
 namespace yii\restclient;
 
-use yii\base\InvalidParamException;
+use yii\db\Expression;
 use yii\base\NotSupportedException;
-use yii\helpers\ArrayHelper;
+//use yii\db\QueryBuilder as BaseQueryBuilder;
+use yii\base\Object;
+use Yii;
 
 /**
  * Class QueryBuilder builds an HiActiveResource query based on the specification given as a [[Query]] object.
  * @package yii\restclient
  */
-class QueryBuilder extends \yii\db\QueryBuilder
+class QueryBuilder extends Object
 {
     /**
      * @type array
@@ -30,15 +32,50 @@ class QueryBuilder extends \yii\db\QueryBuilder
     ];
 
     /**
-     * @param RestQuery $query
+     * @var Connection the database connection.
+     */
+    public $db;
+    /**
+     * @var string the separator between different fragments of a SQL statement.
+     * Defaults to an empty space. This is mainly used by [[build()]] when generating a SQL statement.
+     */
+    public $separator = ' ';
+    /**
+     * @var array the abstract column types mapped to physical column types.
+     * This is mainly used to support creating/modifying tables using DB-independent data type specifications.
+     * Child classes should override this property to declare supported type mappings.
+     */
+    public $typeMap = [];
+
+    /**
+     * @var array map of query condition to builder methods.
+     * These methods are used by [[buildCondition]] to build SQL conditions from array syntax.
+     */
+    protected $conditionBuilders = [
+        'AND' => 'buildAndCondition',
+    ];
+
+
+    /**
+     * Constructor.
+     * @param Connection $connection the database connection.
+     * @param array $config name-value pairs that will be used to initialize the object properties
+     */
+    public function __construct($connection, $config = [])
+    {
+        $this->db = $connection;
+        parent::__construct($config);
+    }
+
+
+    /**
+     * @param Query $query
      * @param array $params
      * @return array
      * @throws NotSupportedException
      */
     public function build($query, $params = [])
     {
-        $query->prepare($this);
-
         $this->buildSelect($query->select, $params);
         $this->buildPerPage($query->limit, $params);
         $this->buildPage($query->offset, $query->limit, $params);
@@ -46,17 +83,10 @@ class QueryBuilder extends \yii\db\QueryBuilder
         $this->buildSort($query->orderBy, $params);
 
         return [
+            'query' => $query,
             'queryParts' => $params,
             'index' => $query->from
         ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function buildLimit($limit, $offset)
-    {
-        throw new NotSupportedException('buildLimit in is not supported.');
     }
 
     /**
@@ -85,14 +115,6 @@ class QueryBuilder extends \yii\db\QueryBuilder
     }
 
     /**
-     * @inheritdoc
-     */
-    public function buildOrderBy($columns)
-    {
-        throw new NotSupportedException('buildOrderBy in is not supported.');
-    }
-
-    /**
      * Преобразуем массив параметров where в массив для поиска
      *
      * @param $condition
@@ -103,11 +125,32 @@ class QueryBuilder extends \yii\db\QueryBuilder
     {
         if (!empty($condition) && is_array($condition)) {
 
-            foreach ($condition as $label => $value) {
-                $params[$searchModel . '[' . $label . ']'] = $value;
-                unset($params[$label]);
+            $where = $this->buildCondition($condition, $params);
+            $params = $this->getParams($searchModel, $where, $params);
+        }
+    }
+
+    /**
+     * @param string $searchModel
+     * @param string|array $where
+     * @param array $params
+     * @return array
+     */
+    protected function getParams($searchModel, $where, $params = [])
+    {
+        if (is_array($where)) {
+            foreach ($where as $key => $value) {
+
+                if (is_array($value)) {
+                    $params = $this->getParams($searchModel, $value, $params);
+                } else {
+                    $params[$searchModel . '[' . $key . ']'] = $value;
+                    unset($params[$key]);
+                }
             }
         }
+
+        return $params;
     }
 
     /**
@@ -127,7 +170,7 @@ class QueryBuilder extends \yii\db\QueryBuilder
     /**
      * @inheritdoc
      */
-    public function buildSelect($columns, &$params, $distinct = false, $selectOption = null)
+    public function buildSelect($columns, &$params)
     {
         if (!empty($columns) AND is_array($columns)) {
             $params['fields'] = implode(',', $columns);
@@ -135,17 +178,43 @@ class QueryBuilder extends \yii\db\QueryBuilder
     }
 
     /**
-     * @inheritdoc
+     * @param $condition
+     * @param $params
+     * @return array|string
+     * @throws NotSupportedException
      */
     public function buildCondition($condition, &$params)
     {
-        throw new NotSupportedException('buildCondition in is not supported.');
+        if ($condition instanceof Expression) {
+            foreach ($condition->params as $n => $v) {
+                $params[$n] = $v;
+            }
+
+            return $condition->expression;
+        } elseif (!is_array($condition)) {
+            return (string)$condition;
+        } elseif (empty($condition)) {
+            return '';
+        }
+
+        if (isset($condition[0])) { // operator format: operator, operand 1, operand 2, ...
+            $operator = strtoupper($condition[0]);
+            if (!isset($this->conditionBuilders[$operator])) {
+                throw new NotSupportedException($operator . ' in is not supported.');
+            }
+            $method = $this->conditionBuilders[$operator];
+            array_shift($condition);
+
+            return $this->$method($operator, $condition, $params);
+        } else { // hash format: 'column1' => 'value1', 'column2' => 'value2', ...
+            return $this->buildHashCondition($condition);
+        }
     }
 
     /**
      * @inheritdoc
      */
-    public function buildHashCondition($condition, &$params)
+    public function buildHashCondition($condition)
     {
         //TODO: проверить работу
         $parts = [];
@@ -163,45 +232,24 @@ class QueryBuilder extends \yii\db\QueryBuilder
     /**
      * @inheritdoc
      */
-    public function buildLikeCondition($operator, $operands, &$params)
-    {
-        throw new NotSupportedException('buildLikeCondition in is not supported.');
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function buildAndCondition($operator, $operands, &$params)
     {
-        throw new NotSupportedException('buildAndCondition in is not supported.');
-    }
+        $parts = [];
+        foreach ($operands as $operand) {
+            if (is_array($operand)) {
+                $operand = $this->buildCondition($operand, $params);
+            }
+            if ($operand instanceof Expression) {
+                foreach ($operand->params as $n => $v) {
+                    $params[$n] = $v;
+                }
+                $operand = $operand->expression;
+            }
+            if ($operand !== '') {
+                $parts[] = $operand;
+            }
+        }
 
-    /**
-     * @inheritdoc
-     */
-    public function buildBetweenCondition($operator, $operands, &$params)
-    {
-        throw new NotSupportedException('buildBetweenCondition is not supported.');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function buildInCondition($operator, $operands, &$params)
-    {
-        throw new NotSupportedException('buildInCondition in is not supported.');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function buildCompositeInCondition($operator, $columns, $values, &$params)
-    {
-        throw new NotSupportedException('buildCompositeInCondition in is not supported.');
-    }
-
-    public function buildWhere($condition, &$params)
-    {
-        throw new NotSupportedException('buildWhere in is not supported.');
+        return $parts;
     }
 }

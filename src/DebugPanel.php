@@ -18,6 +18,7 @@ use yii\helpers\StringHelper;
 use yii\helpers\Url;
 use yii\log\Logger;
 use yii\web\View;
+use yii\base\InvalidConfigException;
 
 /**
  * Class DebugPanel Debugger panel that collects and displays Rest Client queries performed.
@@ -85,16 +86,20 @@ HTML;
         $i = 0;
         // Try to get API URL
         try {
-            $restclient = \Yii::$app->get('restclient');
-            $apiUrl = (StringHelper::endsWith($restclient->config['base_uri'], '/'))
-                ? $restclient->config['base_uri']
-                : $restclient->config['base_uri'] . '/';
-        } catch (\yii\base\InvalidConfigException $e) {
+            $restClient = \Yii::$app->get('restclient');
+            $apiUrl = (StringHelper::endsWith($restClient->config['base_uri'], '/'))
+                ? $restClient->config['base_uri']
+                : $restClient->config['base_uri'] . '/';
+        } catch (InvalidConfigException $e) {
             // Pass
         }
+
         foreach ($timings as $logId => $timing) {
-            $time = date('H:i:s.', $timing[2]) . sprintf('%03d', (int)(($timing[2] - (int)$timing[2]) * 1000));
-            $duration = sprintf('%.1f ms', $timing[3] * 1000);
+            $time = $duration = '-';
+            if (is_double($timing[2])) {
+                $time = date('H:i:s.', $timing[2]) . sprintf('%03d', (int)(($timing[2] - (int)$timing[2]) * 1000));
+                $duration = sprintf('%.1f ms', $timing[3] * 1000);
+            }
             $message = $timing[1];
             $traces = $timing[4];
 
@@ -105,10 +110,15 @@ HTML;
                 $url = $message;
                 $body = null;
             }
+
+            if (($pos = mb_strpos($message, ' ')) !== false) {
+                $method = mb_substr($message, 0, $pos);
+            } else {
+                $method = null;
+            }
+
             $traceString = '';
             if (!empty($traces)) {
-
-
                 $traceString .= Html::ul($traces, [
                     'class' => 'trace',
                     'item' => function ($trace) {
@@ -116,13 +126,19 @@ HTML;
                     },
                 ]);
             }
-            $ajaxUrl = Url::to(['rest-query', 'logId' => $logId, 'tag' => $this->tag]);
-            $runLink = Html::a('run query', $ajaxUrl, [
-                    'class' => 'restclient-link',
-                    'data' => ['id' => $i],
-                ]) . '<br/>';
-            $newTabLink = Html::a('to new tab', $apiUrl . preg_replace('/^[A-Z]+\s+/', '', $url) . $body,
-                    ['target' => '_blank']) . '<br/>';
+
+            $runLink = $newTabLink = '';
+            if ($method == 'GET') {
+                $runLink = Html::a('run query',
+                    Url::to(['rest-query', 'logId' => $logId, 'tag' => $this->tag]),
+                    ['class' => 'restclient-link', 'data' => ['id' => $i]]
+                );
+                $newTabLink = Html::a('to new tab',
+                    $apiUrl . preg_replace('/^[A-Z]+\s+/', '', $url) . $body,
+                    ['target' => '_blank']
+                );
+            }
+
             $url_encoded = Html::encode((isset($apiUrl)) ? str_replace(' ', ' ' . $apiUrl, $url) : $url);
             $body_encoded = Html::encode($body);
             $rows[] = <<<HTML
@@ -130,7 +146,7 @@ HTML;
     <td style="width: 10%;">$time</td>
     <td style="width: 10%;">$duration</td>
     <td style="width: 75%;"><div><b>$url_encoded</b><br/><p>$body_encoded</p>$traceString</div></td>
-    <td style="width: 15%;">$runLink$newTabLink</td>
+    <td style="width: 15%;">$runLink<br/>$newTabLink</td>
 </tr>
 <tr style="display: none;" class="restclient-wrapper" data-id="$i">
     <td class="time"></td>

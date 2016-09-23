@@ -12,9 +12,6 @@
 namespace yii\restclient;
 
 use yii\base\Component;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Inflector;
-use yii\helpers\Json;
 
 /**
  * Class Command class implements the API for accessing REST API.
@@ -26,10 +23,16 @@ class Command extends Component
      * @var Connection
      */
     public $db;
+
     /**
      * @var string|array the indexes to execute the query on. Defaults to null meaning all indexes
      */
     public $index;
+
+    /**
+     * @var Query
+     */
+    public $query;
 
     /**
      * @var array list of arrays or json strings that become parts of a query
@@ -41,28 +44,40 @@ class Command extends Component
      */
 
     /**
-     * @param array $options
      * @return mixed
      */
-    public function queryAll($options = [])
+    public function queryAll()
     {
         $url = $this->index;
         $query = is_array($this->queryParts) ? $this->queryParts : [];
-        $options = ArrayHelper::merge($query, $options);
 
-        return $this->db->get($url, $options);
+        return $this->db->get($url, $query);
     }
 
     /**
-     * @param array $options
      * @return mixed
      */
-    public function queryOne($options = [])
+    public function queryOne()
     {
-        //TODO: use $this->getOldPrimaryKey() yii\restclient\ActiveRecord
-        $url = $this->index . '/' . current($this->queryParts);
+        /* @var $query RestQuery */
+        $query = $this->query;
 
-        return $this->db->get($url);
+        /* @var $class ActiveRecord */
+        $class = $query->modelClass;
+        $pks = $class::primaryKey();
+
+        $url = $this->index;
+        if (count($pks) == 1) {
+            $primaryKey = current($pks);
+            if (count($this->query->where) == 1 && isset($this->query->where[$primaryKey])) {
+
+                return $this->db->get($url . '/' . $this->query->where[$primaryKey]);
+            }
+        }
+
+        $query = is_array($this->queryParts) ? $this->queryParts : [];
+
+        return $this->db->get($url, $query);
     }
 
     /**

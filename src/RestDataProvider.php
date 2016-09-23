@@ -11,13 +11,15 @@
 
 namespace yii\restclient;
 
+use yii\base\InvalidConfigException;
 use yii\db\QueryInterface;
+use yii\data\ActiveDataProvider;
 
 /**
  * Class RestDataProvider
  * @package yii\restclient
  */
-class RestDataProvider extends \yii\data\ActiveDataProvider
+class RestDataProvider extends ActiveDataProvider
 {
     /**
      * @var RestQuery the query that is used to fetch data models and [[totalCount]]

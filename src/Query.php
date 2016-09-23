@@ -11,10 +11,10 @@
 
 namespace yii\restclient;
 
-use Yii;
 use yii\db\QueryInterface;
-use yii\db\QueryTrait;
 use yii\helpers\ArrayHelper;
+use yii\base\NotSupportedException;
+use Yii;
 
 /**
  * Class Query
@@ -24,6 +24,15 @@ class Query extends \yii\db\Query implements QueryInterface
 {
     /** @type string Название модели, которая используется для поиска */
     public $searchModel;
+
+    /**
+     * @param QueryBuilder $builder
+     * @return $this
+     */
+    public function prepare($builder)
+    {
+        return $this;
+    }
 
     /**
      * @param null $db

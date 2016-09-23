@@ -11,12 +11,11 @@
 
 namespace yii\restclient;
 
-use Yii;
-use yii\base\NotSupportedException;
+use yii\base\InvalidConfigException;
 use yii\db\ActiveQueryInterface;
 use yii\db\ActiveQueryTrait;
 use yii\db\ActiveRelationTrait;
-use yii\helpers\ArrayHelper;
+use Yii;
 
 /**
  * Class RestQuery
@@ -107,18 +106,71 @@ class RestQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * Removes duplicated models by checking their primary key values.
+     * This method is mainly called when a join query is performed, which may cause duplicated rows being returned.
+     * @param array $models the models to be checked
+     * @throws InvalidConfigException if model primary key is empty
+     * @return array the distinctive models
+     */
+    private function removeDuplicatedModels($models)
+    {
+        $hash = [];
+        /* @var $class ActiveRecord */
+        $class = $this->modelClass;
+        $pks = $class::primaryKey();
+
+        if (count($pks) > 1) {
+            // composite primary key
+            foreach ($models as $i => $model) {
+                $key = [];
+                foreach ($pks as $pk) {
+                    if (!isset($model[$pk])) {
+                        // do not continue if the primary key is not part of the result set
+                        break 2;
+                    }
+                    $key[] = $model[$pk];
+                }
+                $key = serialize($key);
+                if (isset($hash[$key])) {
+                    unset($models[$i]);
+                } else {
+                    $hash[$key] = true;
+                }
+            }
+        } elseif (empty($pks)) {
+            throw new InvalidConfigException("Primary key of '{$class}' can not be empty.");
+        } else {
+            // single column primary key
+            $pk = reset($pks);
+            foreach ($models as $i => $model) {
+                if (!isset($model[$pk])) {
+                    // do not continue if the primary key is not part of the result set
+                    break;
+                }
+                $key = $model[$pk];
+                if (isset($hash[$key])) {
+                    unset($models[$i]);
+                } elseif ($key !== null) {
+                    $hash[$key] = true;
+                }
+            }
+        }
+
+        return array_values($models);
+    }
+
+    /**
      * @inheritdoc
      */
     public function one($db = null)
     {
         $row = parent::one($db);
-
         if ($row !== false) {
-            $models = $this->populate([$row]);
+            $models = $this->populate(isset($row[0]) ? $row : [$row]);
 
             return reset($models) ?: null;
-        } else {
-            return null;
         }
+
+        return null;
     }
 }

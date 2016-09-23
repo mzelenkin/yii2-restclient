@@ -14,12 +14,10 @@ namespace yii\restclient;
 use Closure;
 use GuzzleHttp\Client as Handler;
 use GuzzleHttp\Psr7\Response;
-use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\base\InvalidParamException;
 use yii\helpers\Json;
-use yii\web\NotFoundHttpException;
+use Yii;
 
 /**
  * Class Connection
@@ -210,6 +208,7 @@ class Connection extends Component
 
     /**
      * Make request and check for error.
+     * @param string $method
      * @param string $url URL
      * @param array $query query options, (GET parameters)
      * @param string $body request body, (POST parameters)
