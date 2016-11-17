@@ -99,7 +99,7 @@ class ActiveRecord extends BaseActiveRecord
         $values = $this->getDirtyAttributes($attributes);
 
         try {
-            $result = static::getDb()->createCommand(['index' => self::modelName()])->insert($values);
+            $result = static::getDb()->createCommand(['index' => static::modelName()])->insert($values);
 
             $pk = static::primaryKey()[0];
             $this->$pk = $result['id'];
@@ -151,7 +151,7 @@ class ActiveRecord extends BaseActiveRecord
         }
 
         try {
-            $result = static::getDb()->createCommand(['index' => self::modelName()])->update(
+            $result = static::getDb()->createCommand(['index' => static::modelName()])->update(
                 $this->getOldPrimaryKey(),
                 $values
             );
@@ -199,7 +199,7 @@ class ActiveRecord extends BaseActiveRecord
         try {
             if ($this->beforeDelete()) {
 
-                static::getDb()->createCommand(['index' => self::modelName()])->delete(
+                static::getDb()->createCommand(['index' => static::modelName()])->delete(
                     $this->getOldPrimaryKey(),
                     $options
                 );
