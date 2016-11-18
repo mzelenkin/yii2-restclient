@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2016, ApexWire
  */
 
-namespace yii\restclient;
+namespace apexwire\restclient;
 
 use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
@@ -18,7 +18,7 @@ use Yii;
 
 /**
  * Class Query
- * @package yii\restclient
+ * @package apexwire\restclient
  */
 class Query extends \yii\db\Query implements QueryInterface
 {

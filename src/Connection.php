@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2016, ApexWire
  */
 
-namespace yii\restclient;
+namespace apexwire\restclient;
 
 use Closure;
 use GuzzleHttp\Client as Handler;
@@ -21,13 +21,13 @@ use Yii;
 
 /**
  * Class Connection
- * @package yii\restclient
+ * @package apexwire\restclient
  *
  * Example configuration:
  * ```php
  * 'components' => [
  *     'restclient' => [
- *         'class' => 'yii\restclient\Connection',
+ *         'class' => 'apexwire\restclient\Connection',
  *         'config' => [
  *             'base_uri' => 'https://api.site.com/',
  *         ],

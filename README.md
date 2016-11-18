@@ -30,7 +30,7 @@ php composer.phar require "apexwire/yii2-restclient"
 ```php
     'components' => [
         'restclient' => [
-            'class' => 'yii\restclient\Connection',
+            'class' => 'apexwire\restclient\Connection',
             'config' => [
                 'base_uri' => 'https://api.site.com/',
             ],
@@ -43,7 +43,7 @@ php composer.phar require "apexwire/yii2-restclient"
 Определите свою модель
 
 ```php
-class MyModel extends \yii\restclient\ActiveRecord
+class MyModel extends \apexwire\restclient\ActiveRecord
 {
     public function attributes()
     {
@@ -60,7 +60,7 @@ class MyModel extends \yii\restclient\ActiveRecord
 $config['modules']['debug'] = [
     'class' => 'yii\debug\Module',
     'panels' => [
-        'rest' => ['class' => 'yii\restclient\DebugPanel'],
+        'rest' => ['class' => 'apexwire\restclient\DebugPanel'],
     ],
 ];
 ```

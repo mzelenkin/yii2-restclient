@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2016, ApexWire
  */
 
-namespace yii\restclient;
+namespace apexwire\restclient;
 
 use yii\base\InvalidConfigException;
 use yii\db\QueryInterface;
@@ -17,7 +17,7 @@ use yii\data\ActiveDataProvider;
 
 /**
  * Class RestDataProvider
- * @package yii\restclient
+ * @package apexwire\restclient
  */
 class RestDataProvider extends ActiveDataProvider
 {

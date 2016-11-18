@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2016, ApexWire
  */
 
-namespace yii\restclient;
+namespace apexwire\restclient;
 
 use yii\db\Expression;
 use yii\base\NotSupportedException;
@@ -19,7 +19,7 @@ use Yii;
 
 /**
  * Class QueryBuilder builds an HiActiveResource query based on the specification given as a [[Query]] object.
- * @package yii\restclient
+ * @package apexwire\restclient
  */
 class QueryBuilder extends Object
 {

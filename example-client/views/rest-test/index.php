@@ -6,7 +6,7 @@ use yii\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\TestSearch */
-/* @var $dataProvider yii\restclient\RestDataProvider */
+/* @var $dataProvider apexwire\restclient\RestDataProvider */
 
 $this->title = 'Список';
 $this->params['breadcrumbs'][] = $this->title;

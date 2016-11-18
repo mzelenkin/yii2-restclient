@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use yii\restclient\ActiveRecord;
+use apexwire\restclient\ActiveRecord;
 
 /**
  * Class Test Базовая модель для доступа по API

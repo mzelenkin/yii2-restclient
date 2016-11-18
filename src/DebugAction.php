@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2016, ApexWire
  */
 
-namespace yii\restclient;
+namespace apexwire\restclient;
 
 use Yii;
 use yii\base\Action;
@@ -20,7 +20,7 @@ use yii\web\Response;
 
 /**
  * Class DebugAction is used by [[DebugPanel]] to perform Rest Client queries using ajax.
- * @package yii\restclient
+ * @package apexwire\restclient
  */
 class DebugAction extends Action
 {

@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2016, ApexWire
  */
 
-namespace yii\restclient;
+namespace apexwire\restclient;
 
 use yii\debug\Panel;
 use yii\helpers\ArrayHelper;
@@ -22,7 +22,7 @@ use yii\base\InvalidConfigException;
 
 /**
  * Class DebugPanel Debugger panel that collects and displays Rest Client queries performed.
- * @package yii\restclient
+ * @package apexwire\restclient
  */
 class DebugPanel extends Panel
 {
@@ -290,7 +290,7 @@ HTML;
     {
         $target = $this->module->logTarget;
         $messages = $target->filterMessages($target->messages, Logger::LEVEL_PROFILE,
-            ['yii\restclient\Connection::handleRequest']);
+            ['apexwire\restclient\Connection::handleRequest']);
 
         return ['messages' => $messages];
     }

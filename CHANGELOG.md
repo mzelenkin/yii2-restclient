@@ -1,8 +1,13 @@
 apexwire/yii2-restclient changelog
 ---------------------------
 
-## 0.4 Under development
+## 0.5 Under development
 
+## 0.4 2016-11-18
+
+- fixBug: save custom modelName #12
+- Implement `ActiveRecord::populateRecord()` method. #11
+- Изменен namespace #13
 
 ## 0.3 2016-09-23
 

@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2016, ApexWire
  */
 
-namespace yii\restclient;
+namespace apexwire\restclient;
 
 use GuzzleHttp\Exception\ClientException;
 use yii\base\InvalidConfigException;
@@ -23,7 +23,7 @@ use yii\helpers\Json;
 
 /**
  * Class ActiveRecord
- * @package yii\restclient
+ * @package apexwire\restclient
  */
 class ActiveRecord extends BaseActiveRecord
 {

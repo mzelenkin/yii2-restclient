@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use yii\restclient\RestDataProvider;
+use apexwire\restclient\RestDataProvider;
 
 /**
  * Class TestSearch Модель для поиска

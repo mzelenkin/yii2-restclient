@@ -9,13 +9,13 @@
  * @copyright Copyright (c) 2016, ApexWire
  */
 
-namespace yii\restclient;
+namespace apexwire\restclient;
 
 use yii\base\Component;
 
 /**
  * Class Command class implements the API for accessing REST API.
- * @package yii\restclient
+ * @package apexwire\restclient
  */
 class Command extends Component
 {

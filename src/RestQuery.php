@@ -9,7 +9,7 @@
  * @copyright Copyright (c) 2016, ApexWire
  */
 
-namespace yii\restclient;
+namespace apexwire\restclient;
 
 use yii\base\InvalidConfigException;
 use yii\db\ActiveQueryInterface;
@@ -19,7 +19,7 @@ use Yii;
 
 /**
  * Class RestQuery
- * @package yii\restclient
+ * @package apexwire\restclient
  */
 class RestQuery extends Query implements ActiveQueryInterface
 {
