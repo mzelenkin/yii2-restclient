@@ -14,6 +14,7 @@ namespace apexwire\restclient;
 use GuzzleHttp\Exception\ClientException;
 use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
+use yii\base\UnknownPropertyException;
 use yii\db\BaseActiveRecord;
 use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
@@ -234,5 +235,20 @@ class ActiveRecord extends BaseActiveRecord
     public function unlinkAll($name, $delete = false)
     {
         throw new NotSupportedException('unlinkAll() is not supported by RestClient, use unlink() instead.');
+    }
+
+    /**
+     * @inheritdoc
+     * @throws \yii\base\UnknownPropertyException
+     */
+    public static function populateRecord($record, $row)
+    {
+        $attributes = array_flip($record->attributes());
+        foreach ($attributes as $attributeName => $attributeValue) {
+            if (!array_key_exists($attributeName, $row)) {
+                throw new UnknownPropertyException("Attribute `{$attributeName}` not found in API response. Available fields: " . implode(', ', array_keys($row)) . '.');
+            }
+        }
+        parent::populateRecord($record, $row);
     }
 }
