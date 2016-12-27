@@ -3,6 +3,10 @@ apexwire/yii2-restclient changelog
 
 ## 0.5 Under development
 
+## 0.4.1 2016-12-27
+
+- fixBug: namespace yii\restclient? (продолжение). #14
+
 ## 0.4 2016-11-18
 
 - fixBug: save custom modelName #12
