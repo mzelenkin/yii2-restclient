@@ -35,7 +35,7 @@ class DebugPanel extends Panel
     public function init()
     {
         $this->actions['rest-query'] = [
-            'class' => 'yii\\restclient\\DebugAction',
+            'class' => 'apexwire\\restclient\\DebugAction',
             'panel' => $this,
             'db' => Connection::getDriverName(),
         ];
