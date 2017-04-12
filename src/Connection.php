@@ -13,6 +13,7 @@ namespace apexwire\restclient;
 
 use Closure;
 use GuzzleHttp\Client as Handler;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -146,7 +147,13 @@ class Connection extends Component
      */
     public function get($url, $query = [], $body = null, $raw = false)
     {
-        return $this->makeRequest('GET', $url, $query, $body, $raw);
+        try {
+            return $this->makeRequest('GET', $url, $query, $body, $raw);
+        } catch (ClientException $e) {
+            if (404 === $e->getCode()) {
+                return false;
+            }
+        }
     }
 
     /**
