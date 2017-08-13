@@ -14,8 +14,10 @@ nbproject
 # vendor dirs
 vendor
 
-# composer lock files
+# composer files
 composer.lock
+composer.bat
+composer.phar
 
 # phpunit generated files
 coverage.clover

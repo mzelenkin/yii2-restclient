@@ -12,9 +12,11 @@
 namespace apexwire\restclient;
 
 use Closure;
-use GuzzleHttp\Client as Handler;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Response;
+//use GuzzleHttp\Client as Handler;
+//use GuzzleHttp\Exception\ClientException;
+//use GuzzleHttp\Psr7\Response;
+use yii\httpclient\Client;
+use yii\httpclient\Exception;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\helpers\Json;
@@ -30,7 +32,7 @@ use Yii;
  *     'restclient' => [
  *         'class' => 'apexwire\restclient\Connection',
  *         'config' => [
- *             'base_uri' => 'https://api.site.com/',
+ *             'baseUrl' => 'https://api.site.com',
  *         ],
  *     ],
  * ],
@@ -47,9 +49,9 @@ class Connection extends Component
     public $config = [];
 
     /**
-     * @var Handler
+     * @var Client
      */
-    protected static $_handler = null;
+    protected static $_client = null;
 
     /**
      * @var array authorization config
@@ -87,8 +89,8 @@ class Connection extends Component
      */
     public function init()
     {
-        if (!$this->config['base_uri']) {
-            throw new InvalidConfigException('The `base_uri` config option must be set');
+        if (!$this->config['baseUrl']) {
+            throw new InvalidConfigException('The `baseUrl` config option must be set');
         }
     }
 
@@ -149,7 +151,7 @@ class Connection extends Component
     {
         try {
             return $this->makeRequest('GET', $url, $query, $body, $raw);
-        } catch (ClientException $e) {
+        } catch (Exception $e) {
             if (404 === $e->getCode()) {
                 return false;
             }
@@ -261,7 +263,15 @@ class Connection extends Component
         $profile = $method . ' ' . $url . '#' . (is_array($body) ? http_build_query($body) : $body);
         $options = [(is_array($body) ? 'form_params' : 'body') => $body];
         Yii::beginProfile($profile, __METHOD__);
-        $this->_response = $this->getHandler()->request($method, $url, $options);
+        $this->_response = $this->getClient()
+//            ->request($method, $url, $options)
+            ->createRequest()
+            ->setMethod($method)
+            ->setUrl($url)
+            ->setData(['name' => 'John Doe', 'email' => 'johndoe@example.com'])
+            ->send();
+
+        ;
         Yii::endProfile($profile, __METHOD__);
 
         $res = $this->_response->getBody()->getContents();
@@ -275,14 +285,14 @@ class Connection extends Component
     /**
      * Returns the request handler (Guzzle client for the moment).
      * Creates and setups handler if not set.
-     * @return Handler
+     * @return Client
      */
-    public function getHandler()
+    public function getClient()
     {
-        if (static::$_handler === null) {
-            static::$_handler = new Handler($this->config);
+        if (static::$_client === null) {
+            static::$_client = new Client($this->config);
         }
 
-        return static::$_handler;
+        return static::$_client;
     }
 }
