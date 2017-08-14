@@ -2,6 +2,7 @@ apexwire/yii2-restclient changelog
 ---------------------------
 
 ## 0.5 Under development
+- Заменить guzzle на yii2-httpclient. #1
 
 ## 0.4.1 2016-12-27
 
