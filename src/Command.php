@@ -44,7 +44,7 @@ class Command extends Component
      */
 
     /**
-     * @return mixed
+     * @return \yii\httpclient\Response
      */
     public function queryAll()
     {
@@ -55,7 +55,7 @@ class Command extends Component
     }
 
     /**
-     * @return mixed
+     * @return \yii\httpclient\Response
      */
     public function queryOne()
     {
@@ -87,7 +87,7 @@ class Command extends Component
     /**
      * Делаем HEAD запрос
      *
-     * @return mixed
+     * @return \yii\httpclient\Response
      */
     public function head()
     {
@@ -101,11 +101,11 @@ class Command extends Component
      *
      * @param array $data
      * @param array $options
-     * @return mixed
+     * @return \yii\httpclient\Response
      */
     public function insert($data = [], $options = [])
     {
-        return $this->db->post($this->index, $options, $data);
+        return $this->db->post($this->index, $data, $options);
     }
 
     /**
@@ -114,7 +114,7 @@ class Command extends Component
      * @param $id
      * @param array $data
      * @param array $options
-     * @return mixed
+     * @return \yii\httpclient\Response
      */
     public function update($id, $data = [], $options = [])
     {
@@ -128,12 +128,20 @@ class Command extends Component
      *
      * @param $id
      * @param array $options
-     * @return mixed
+     * @return \yii\httpclient\Response
      */
     public function delete($id, $options = [])
     {
         $url = $this->index . '/' . $id;
 
         return $this->db->delete($url, $options);
+    }
+
+    /**
+     * @return \yii\httpclient\Response
+     */
+    public function getResponse()
+    {
+        return $this->db->getResponse();
     }
 }

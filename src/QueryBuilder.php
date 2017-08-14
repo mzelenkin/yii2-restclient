@@ -13,15 +13,13 @@ namespace apexwire\restclient;
 
 use yii\db\Expression;
 use yii\base\NotSupportedException;
-//use yii\db\QueryBuilder as BaseQueryBuilder;
-use yii\base\Object;
-use Yii;
+use yii\base\BaseObject;
 
 /**
  * Class QueryBuilder builds an HiActiveResource query based on the specification given as a [[Query]] object.
  * @package apexwire\restclient
  */
-class QueryBuilder extends Object
+class QueryBuilder extends BaseObject
 {
     /**
      * @type array
@@ -54,7 +52,6 @@ class QueryBuilder extends Object
     protected $conditionBuilders = [
         'AND' => 'buildAndCondition',
     ];
-
 
     /**
      * Constructor.
@@ -158,7 +155,6 @@ class QueryBuilder extends Object
      *
      * @param $orderBy
      * @param $params
-     * @return array
      */
     public function buildSort($orderBy, &$params)
     {
@@ -230,7 +226,10 @@ class QueryBuilder extends Object
     }
 
     /**
-     * @inheritdoc
+     * @param $operator
+     * @param $operands
+     * @param $params
+     * @return array
      */
     public function buildAndCondition($operator, $operands, &$params)
     {

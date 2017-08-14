@@ -8,7 +8,7 @@ use yii\bootstrap\ActiveForm;
 /* @var $form yii\bootstrap\ActiveForm */
 ?>
 
-<div class="account-form">
+<div class="test-form">
 
     <?php $form = ActiveForm::begin(); ?>
 

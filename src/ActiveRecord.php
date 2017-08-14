@@ -11,16 +11,13 @@
 
 namespace apexwire\restclient;
 
-use GuzzleHttp\Exception\ClientException;
 use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\base\UnknownPropertyException;
 use yii\db\BaseActiveRecord;
 use yii\helpers\Inflector;
 use yii\helpers\StringHelper;
-use yii\web\HttpException;
 use yii\web\NotFoundHttpException;
-use yii\helpers\Json;
 
 /**
  * Class ActiveRecord
@@ -29,7 +26,7 @@ use yii\helpers\Json;
 class ActiveRecord extends BaseActiveRecord
 {
     /**
-     * @return null|Connection
+     * @return Connection|object|null
      * @throws InvalidConfigException
      */
     public static function getDb()
@@ -40,7 +37,7 @@ class ActiveRecord extends BaseActiveRecord
     /**
      * @inheritdoc
      *
-     * @return RestQuery
+     * @return RestQuery|\yii\db\ActiveQueryInterface|object
      */
     public static function find($options = [])
     {
@@ -98,10 +95,12 @@ class ActiveRecord extends BaseActiveRecord
         }
 
         $values = $this->getDirtyAttributes($attributes);
+        $command = static::getDb()->createCommand(['index' => static::modelName()]);
+        $result = $command->insert($values);
+        $response = $command->getResponse();
 
-        try {
-            $result = static::getDb()->createCommand(['index' => static::modelName()])->insert($values);
-
+        if ($response->isOk) {
+            $this->setAttributes($result);
             $pk = static::primaryKey()[0];
             $this->$pk = $result['id'];
             if ($pk !== 'id') {
@@ -110,31 +109,24 @@ class ActiveRecord extends BaseActiveRecord
             $changedAttributes = array_fill_keys(array_keys($values), null);
             $this->setOldAttributes($values);
             $this->afterSave(true, $changedAttributes);
-        } catch (ClientException $e) {
 
-            if ($e->getCode() == 422) {
-                $res = $e->getResponse()->getBody()->getContents();
-
-                if (preg_grep('|application/json|i', $e->getResponse()->getHeader('Content-Type'))) {
-                    $res = Json::decode($res);
-
-                    foreach ($res as $error) {
-                        $this->addError($error['field'], $error['message']);
-                    }
-
-                    return false;
-                } else {
-                    throw new HttpException($e->getCode(), 'Не верный формат данных.', $e->getCode());
-                }
-            } else {
-                throw new \Exception('При создании возникли ошибки', 500, $e);
-            }
+            return true;
         }
 
-        return true;
+        switch ($response->getStatusCode()) {
+            case 422:
+                foreach ($result as $error) {
+                    $this->addError($error['field'], $error['message']);
+                }
+                break;
+
+        }
+
+        return false;
     }
 
     /**
+     * //TODO проверить обновление записи
      * @inheritdoc
      */
     protected function updateInternal($attributes = null)
@@ -151,12 +143,14 @@ class ActiveRecord extends BaseActiveRecord
             return 0;
         }
 
-        try {
-            $result = static::getDb()->createCommand(['index' => static::modelName()])->update(
-                $this->getOldPrimaryKey(),
-                $values
-            );
+        $command = static::getDb()->createCommand(['index' => static::modelName()]);
+        $result = $command->update(
+            $this->getOldPrimaryKey(),
+            $values
+        );
+        $response = $command->getResponse();
 
+        if ($response->isOk) {
             $changedAttributes = [];
             foreach ($values as $name => $value) {
                 $changedAttributes[$name] = $this->getOldAttribute($name);
@@ -164,57 +158,49 @@ class ActiveRecord extends BaseActiveRecord
             }
 
             $this->afterSave(false, $changedAttributes);
-        } catch (ClientException $e) {
 
-            if ($e->getCode() == 422) {
-
-                $res = $e->getResponse()->getBody()->getContents();
-
-                if (preg_grep('|application/json|i', $e->getResponse()->getHeader('Content-Type'))) {
-                    $res = Json::decode($res);
-
-                    foreach ($res as $error) {
-                        $this->addError($error['field'], $error['message']);
-                    }
-
-                    return false;
-                } else {
-                    throw new HttpException($e->getCode(), 'Не верный формат данных.', $e->getCode());
-                }
-            } else {
-                throw new \Exception('При обновлении возникли ошибки', 500, $e);
-            }
+            //TODO проверить возвращаемое значение
+            return $result;
         }
 
-        return $result;
+        switch ($response->getStatusCode()) {
+            case 422:
+                foreach ($result as $error) {
+                    $this->addError($error['field'], $error['message']);
+                }
+                break;
+
+        }
+
+        return 0;
     }
 
-
     /**
+     * //TODO проверить удаление записи
      * @inheritdoc
      */
     public function delete($options = [])
     {
         $result = false;
+        if ($this->beforeDelete()) {
+            $command = static::getDb()->createCommand(['index' => static::modelName()]);
+            $result = $command->delete(
+                $this->getOldPrimaryKey(),
+                $options
+            );
+            $response = $command->getResponse();
 
-        try {
-            if ($this->beforeDelete()) {
-
-                static::getDb()->createCommand(['index' => static::modelName()])->delete(
-                    $this->getOldPrimaryKey(),
-                    $options
-                );
-
-                $result = true;
+            if ($response->isOk) {
                 $this->setOldAttributes(null);
                 $this->afterDelete();
-            }
-        } catch (\Exception $e) {
 
-            if ($e->getCode() == 404) {
-                throw new NotFoundHttpException('Страница для удаления не найдена.');
-            } else {
-                throw new \Exception('При удалении возникли ошибки', 500, $e);
+                return true;
+            }
+
+            switch ($response->getStatusCode()) {
+                case 404:
+                    throw new NotFoundHttpException('Страница для удаления не найдена.');
+                    break;
             }
         }
 
