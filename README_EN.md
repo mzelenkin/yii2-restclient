@@ -32,7 +32,7 @@ To use this extension, configure restclient component in your application config
         'restclient' => [
             'class' => 'apexwire\restclient\Connection',
             'config' => [
-                'base_uri' => 'https://api.site.com/',
+                'baseUrl' => 'https://api.site.com/',
             ],
         ],
     ],
@@ -54,13 +54,15 @@ class MyModel extends \apexwire\restclient\ActiveRecord
 
 ## Debug
 
-Connection example debug panel
+Connection example yii2-httpclient debug panel
 
 ```php
 $config['modules']['debug'] = [
     'class' => 'yii\debug\Module',
     'panels' => [
-        'rest' => ['class' => 'apexwire\restclient\DebugPanel'],
+        'httpclient' => [
+            'class' => 'yii\\httpclient\\debug\\HttpClientPanel',
+        ],
     ],
 ];
 ```

@@ -32,7 +32,7 @@ php composer.phar require "apexwire/yii2-restclient"
         'restclient' => [
             'class' => 'apexwire\restclient\Connection',
             'config' => [
-                'base_uri' => 'https://api.site.com/',
+                'baseUrl' => 'https://api.site.com/',
             ],
         ],
     ],
@@ -54,13 +54,17 @@ class MyModel extends \apexwire\restclient\ActiveRecord
 
 ## Debug
 
-Пример подключения debug панели
+Так как расширение использует yii2-httpclient, то можно использовать панели из этой библиотеки
+
+Пример подключения панели
 
 ```php
 $config['modules']['debug'] = [
     'class' => 'yii\debug\Module',
     'panels' => [
-        'rest' => ['class' => 'apexwire\restclient\DebugPanel'],
+        'httpclient' => [
+            'class' => 'yii\\httpclient\\debug\\HttpClientPanel',
+        ],
     ],
 ];
 ```

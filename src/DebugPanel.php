@@ -87,9 +87,8 @@ HTML;
         // Try to get API URL
         try {
             $restClient = \Yii::$app->get('restclient');
-            $apiUrl = (StringHelper::endsWith($restClient->config['base_uri'], '/'))
-                ? $restClient->config['base_uri']
-                : $restClient->config['base_uri'] . '/';
+            $baseUrl = $restClient->config['baseUrl'];
+            $apiUrl = (StringHelper::endsWith($baseUrl, '/')) ? $baseUrl : $baseUrl . '/';
         } catch (InvalidConfigException $e) {
             // Pass
         }
@@ -100,21 +99,25 @@ HTML;
                 $time = date('H:i:s.', $timing[2]) . sprintf('%03d', (int)(($timing[2] - (int)$timing[2]) * 1000));
                 $duration = sprintf('%.1f ms', $timing[3] * 1000);
             }
-            $message = $timing[1];
+            $url = $message = $timing[1];
             $traces = $timing[4];
+            $query_data = '';
+            $query_options = '';
 
             if (($pos = mb_strpos($message, '#')) !== false) {
                 $url = mb_substr($message, 0, $pos);
-                $body = mb_substr($message, $pos + 1);
-            } else {
-                $url = $message;
-                $body = null;
+                $params = unserialize(mb_substr($message, $pos + 1));
+                if (isset($params['data']) && !empty($params['data'])) {
+                    $query_data = '?'.http_build_query($params['data']);
+                }
+                if (isset($params['options']) && !empty($params['options'])) {
+                    $query_options = json_encode($params['options']);
+                }
             }
 
+            $method = null;
             if (($pos = mb_strpos($message, ' ')) !== false) {
                 $method = mb_substr($message, 0, $pos);
-            } else {
-                $method = null;
             }
 
             $traceString = '';
@@ -134,18 +137,17 @@ HTML;
                     ['class' => 'restclient-link', 'data' => ['id' => $i]]
                 );
                 $newTabLink = Html::a('to new tab',
-                    $apiUrl . preg_replace('/^[A-Z]+\s+/', '', $url) . $body,
+                    $apiUrl . preg_replace('/^[A-Z]+\s+/', '', $url) . $query_data,
                     ['target' => '_blank']
                 );
             }
 
-            $url_encoded = Html::encode((isset($apiUrl)) ? str_replace(' ', ' ' . $apiUrl, $url) : $url);
-            $body_encoded = Html::encode($body);
+            $url_encoded = Html::encode((isset($apiUrl)) ? str_replace(' ', ' ' . $apiUrl, $url) : $url).$query_data;
             $rows[] = <<<HTML
 <tr>
     <td style="width: 10%;">$time</td>
     <td style="width: 10%;">$duration</td>
-    <td style="width: 75%;"><div><b>$url_encoded</b><br/><p>$body_encoded</p>$traceString</div></td>
+    <td style="width: 75%;"><div>$url_encoded<br/><p>$query_options</p>$traceString</div></td>
     <td style="width: 15%;">$runLink<br/>$newTabLink</td>
 </tr>
 <tr style="display: none;" class="restclient-wrapper" data-id="$i">

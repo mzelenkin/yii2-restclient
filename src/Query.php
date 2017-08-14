@@ -11,10 +11,11 @@
 
 namespace apexwire\restclient;
 
+use Yii;
+use yii\rest\Serializer;
 use yii\db\QueryInterface;
 use yii\helpers\ArrayHelper;
 use yii\base\NotSupportedException;
-use Yii;
 
 /**
  * Class Query
@@ -36,7 +37,7 @@ class Query extends \yii\db\Query implements QueryInterface
 
     /**
      * @param null $db
-     * @return mixed
+     * @return Command
      * @throws \yii\base\InvalidConfigException
      */
     public function createCommand($db = null)
@@ -56,13 +57,15 @@ class Query extends \yii\db\Query implements QueryInterface
      *
      * @param string $q
      * @param null $db
-     * @return mixed
+     * @return int|string
      */
     public function count($q = '*', $db = null)
     {
-        $result = $this->createCommand($db)->head();
+        $totalCountHeader = strtolower((new Serializer)->totalCountHeader);
 
-        return current(ArrayHelper::getValue($result, 'X-Pagination-Total-Count'));
+        return ($count = ArrayHelper::getValue($this->createCommand($db)->head(), $totalCountHeader))
+            ? current($count)
+            : 0;
     }
 
     /**

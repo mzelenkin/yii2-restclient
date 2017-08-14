@@ -56,9 +56,17 @@ class DebugAction extends Action
             throw new HttpException(404, 'Log message not found.');
         }
         $message = $timings[$logId][1];
+        $data = [];
+        $options = [];
         if (($pos = mb_strpos($message, '#')) !== false) {
             $url = mb_substr($message, 0, $pos);
-            $body = mb_substr($message, $pos + 1);
+            $params = unserialize(mb_substr($message, $pos + 1));
+            if (isset($params['data']) && !empty($params['data'])) {
+                $data = $params['data'];
+            }
+            if (isset($params['options']) && !empty($params['options'])) {
+                $options = $params['options'];
+            }
         } else {
             $url = $message;
             $body = null;
@@ -66,26 +74,24 @@ class DebugAction extends Action
         $method = mb_substr($url, 0, $pos = mb_strpos($url, ' '));
         $url = mb_substr($url, $pos + 1);
 
-        parse_str($body, $options);
-
         /* @var $db Connection */
         $db = \Yii::$app->get($this->db);
         $time = microtime(true);
         switch ($method) {
             case 'GET':
-                $result = $db->get($url, $options, $body, true);
+                $result = $db->get($url, $data, $options);
                 break;
             case 'POST':
-                $result = $db->post($url, $options, $body, true);
+                $result = $db->post($url, $data, $options);
                 break;
             case 'PUT':
-                $result = $db->put($url, $options, $body, true);
+                $result = $db->put($url, $data, $options);
                 break;
             case 'DELETE':
-                $result = $db->delete($url, $options, $body, true);
+                $result = $db->delete($url, $data, $options);
                 break;
             case 'HEAD':
-                $result = $db->head($url, $options, $body);
+                $result = $db->head($url, $data, $options);
                 break;
             default:
                 throw new NotSupportedException("Request method '$method' is not supported by HiArt.");

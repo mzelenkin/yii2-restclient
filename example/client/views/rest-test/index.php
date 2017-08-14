@@ -11,7 +11,7 @@ use yii\grid\GridView;
 $this->title = 'Список';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="account-index">
+<div class="test-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
