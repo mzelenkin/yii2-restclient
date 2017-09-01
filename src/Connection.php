@@ -148,12 +148,8 @@ class Connection extends Component
      */
     public function get($url, $data = [], $options = [])
     {
-        $response = $this->makeRequest('GET', $url, $data, $options);
-        if ($response->isOk) {
-            return $this->getResponseJsonContent();
-        }
-
-        return false;
+        $this->makeRequest('GET', $url, $data, $options);
+        return $this->getResponseJsonContent();
     }
 
     /**
@@ -184,12 +180,8 @@ class Connection extends Component
      */
     public function post($url, $data = [], $options = [])
     {
-        $response = $this->makeRequest('POST', $url, $data, $options);
-        if ($response->isOk) {
-            return $this->getResponseJsonContent();
-        }
-
-        return false;
+        $this->makeRequest('POST', $url, $data, $options);
+        return $this->getResponseJsonContent();
     }
 
     /**
@@ -202,12 +194,8 @@ class Connection extends Component
      */
     public function put($url, $data = [], $options = [])
     {
-        $response = $this->makeRequest('PUT', $url, $data, $options);
-        if ($response->isOk) {
-            return $this->getResponseJsonContent();
-        }
-
-        return false;
+        $this->makeRequest('PUT', $url, $data, $options);
+        return $this->getResponseJsonContent();
     }
 
     /**
@@ -220,12 +208,8 @@ class Connection extends Component
      */
     public function delete($url, $data = [], $options = [])
     {
-        $response = $this->makeRequest('DELETE', $url, $data, $options);
-        if ($response->isOk) {
-            return $this->getResponseJsonContent();
-        }
-
-        return false;
+        $this->makeRequest('DELETE', $url, $data, $options);
+        return $this->getResponseJsonContent();
     }
 
     /**
