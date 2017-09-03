@@ -164,7 +164,7 @@ class RestQuery extends Query implements ActiveQueryInterface
     public function one($db = null)
     {
         $row = parent::one($db);
-        if ($row !== false) {
+        if ($row !== false && !empty($row)) {
             $models = $this->populate(isset($row[0]) ? $row : [$row]);
 
             return reset($models) ?: null;
