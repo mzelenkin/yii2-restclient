@@ -158,8 +158,7 @@ class ActiveRecord extends BaseActiveRecord
 
             $this->afterSave(false, $changedAttributes);
 
-            //TODO проверить возвращаемое значение
-            return $result;
+            return 1;
         }
 
         switch ($response->getStatusCode()) {
