@@ -126,7 +126,6 @@ class ActiveRecord extends BaseActiveRecord
     }
 
     /**
-     * //TODO проверить обновление записи
      * @inheritdoc
      */
     protected function updateInternal($attributes = null)

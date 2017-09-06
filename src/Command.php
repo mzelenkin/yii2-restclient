@@ -120,7 +120,7 @@ class Command extends Component
     {
         $url = $this->index . '/' . $id;
 
-        return $this->db->put($url, $options, $data);
+        return $this->db->put($url, $data, $options);
     }
 
     /**
