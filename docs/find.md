@@ -34,9 +34,13 @@
                 'prepareDataProvider' => function ($action) {
                     $modelClass = $action->modelClass;
                     $searchClass = $this->searchClass;
+                    $params = ArrayHelper::merge(
+                        Yii::$app->request->get(mb_substr(mb_strrchr($searchClass, '\\'), 1), []),
+                        Yii::$app->request->post(mb_substr(mb_strrchr($searchClass, '\\'), 1), [])
+                    );
 
                     $query = ($searchClass)
-                        ? $searchClass::search(\Yii::$app->request->get(mb_substr(mb_strrchr($searchClass, '\\'), 1)))
+                        ? $searchClass::search($params)
                         : $modelClass::find();
 
                     return new ActiveDataProvider([
