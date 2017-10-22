@@ -148,7 +148,7 @@ class Connection extends Component
      */
     public function get($url, $data = [], $options = [])
     {
-        $this->makeRequest('GET', $url, $data, $options);
+        $this->handleRequest('GET', $url, $data, $options);
         return $this->getResponseJsonContent();
     }
 
@@ -162,7 +162,7 @@ class Connection extends Component
      */
     public function head($url, $data = [], $options = [])
     {
-        $response = $this->makeRequest('HEAD', $url, $data, $options);
+        $response = $this->handleRequest('HEAD', $url, $data, $options);
         if ($response->isOk) {
             return $response->getHeaders()->toArray();
         }
@@ -180,7 +180,7 @@ class Connection extends Component
      */
     public function post($url, $data = [], $options = [])
     {
-        $this->makeRequest('POST', $url, $data, $options);
+        $this->handleRequest('POST', $url, $data, $options);
         return $this->getResponseJsonContent();
     }
 
@@ -194,7 +194,7 @@ class Connection extends Component
      */
     public function put($url, $data = [], $options = [])
     {
-        $this->makeRequest('PUT', $url, $data, $options);
+        $this->handleRequest('PUT', $url, $data, $options);
         return $this->getResponseJsonContent();
     }
 
@@ -208,22 +208,8 @@ class Connection extends Component
      */
     public function delete($url, $data = [], $options = [])
     {
-        $this->makeRequest('DELETE', $url, $data, $options);
+        $this->handleRequest('DELETE', $url, $data, $options);
         return $this->getResponseJsonContent();
-    }
-
-    /**
-     * Make request and check for error.
-     * @param string $method
-     * @param string $url URL
-     * @param array $data query data, (GET parameters)
-     * @param array $options request options, (POST parameters)
-     * @throws \yii\base\InvalidConfigException
-     * @return mixed response
-     */
-    public function makeRequest($method, $url, $data = [], $options = [])
-    {
-        return $this->handleRequest($method, $url, $data, $options);
     }
 
     /**
