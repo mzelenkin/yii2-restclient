@@ -119,7 +119,9 @@ class ActiveRecord extends BaseActiveRecord
                     $this->addError($error['field'], $error['message']);
                 }
                 break;
-
+            default:
+                throw new $result['type']($result['message'], $result['status']);
+                break;
         }
 
         return false;
@@ -167,10 +169,12 @@ class ActiveRecord extends BaseActiveRecord
                     $this->addError($error['field'], $error['message']);
                 }
                 break;
-
+            default:
+                throw new $result['type']($result['message'], $result['status']);
+                break;
         }
 
-        return 0;
+        return false;
     }
 
     /**
@@ -198,6 +202,9 @@ class ActiveRecord extends BaseActiveRecord
             switch ($response->getStatusCode()) {
                 case 404:
                     throw new NotFoundHttpException('Страница для удаления не найдена.');
+                    break;
+                default:
+                    throw new $result['type']($result['message'], $result['status']);
                     break;
             }
         }

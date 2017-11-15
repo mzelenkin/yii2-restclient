@@ -74,6 +74,7 @@ class QueryBuilder extends BaseObject
     public function build($query, $params = [])
     {
         $this->buildSelect($query->select, $params);
+        $this->buildExpand($query->expand, $params);
         $this->buildPerPage($query->limit, $params);
         $this->buildPage($query->offset, $query->limit, $params);
         $this->buildFind($query->where, $query->searchModel, $params);
@@ -164,12 +165,24 @@ class QueryBuilder extends BaseObject
     }
 
     /**
-     * @inheritdoc
+     * @param $columns
+     * @param $params
      */
     public function buildSelect($columns, &$params)
     {
         if (!empty($columns) AND is_array($columns)) {
             $params['fields'] = implode(',', $columns);
+        }
+    }
+
+    /**
+     * @param $columns
+     * @param $params
+     */
+    public function buildExpand($columns, &$params)
+    {
+        if (!empty($columns) AND is_array($columns)) {
+            $params['expand'] = implode(',', $columns);
         }
     }
 
@@ -208,7 +221,8 @@ class QueryBuilder extends BaseObject
     }
 
     /**
-     * @inheritdoc
+     * @param $condition
+     * @return array
      */
     public function buildHashCondition($condition)
     {
