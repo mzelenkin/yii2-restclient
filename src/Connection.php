@@ -259,7 +259,7 @@ class Connection extends Component
     {
         $method = strtoupper($method);
         $profile = $method . ' ' . $url . '#' . (is_array($body) ? http_build_query($body) : $body);
-        $options = [(is_array($body) ? 'form_params' : 'body') => $body];
+        $options = ['body' => is_array($body)?\json_encode($body):$body];
         Yii::beginProfile($profile, __METHOD__);
         $this->_response = $this->getHandler()->request($method, $url, $options);
         Yii::endProfile($profile, __METHOD__);
